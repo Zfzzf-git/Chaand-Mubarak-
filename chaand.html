@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Rockstar Chand Raat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Amiri',serif;}
+
+body{
+height:100vh;
+overflow:hidden;
+background:radial-gradient(circle at bottom,#000428,#001f4d);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+}
+
+/* Intro */
+#intro{
+position:absolute;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10;
+transition:1s;
+}
+
+button{
+padding:18px 45px;
+font-size:22px;
+border:none;
+border-radius:50px;
+background:linear-gradient(45deg,gold,orange);
+cursor:pointer;
+box-shadow:0 0 25px gold;
+transition:0.3s;
+}
+
+button:active{transform:scale(0.95);}
+
+#message{
+position:absolute;
+top:12%;
+font-size:65px;
+opacity:0;
+transition:2s;
+background:linear-gradient(90deg,gold,white,gold);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+#countdown{
+position:absolute;
+top:5%;
+font-size:20px;
+opacity:0;
+transition:2s;
+}
+
+/* Mosque */
+.mosque{
+position:absolute;
+bottom:0;
+width:100%;
+height:180px;
+background:black;
+clip-path:polygon(0 100%,100% 100%,100% 60%,90% 60%,90% 70%,85% 70%,85% 55%,75% 55%,75% 75%,70% 75%,70% 60%,60% 60%,60% 80%,50% 80%,50% 60%,40% 60%,40% 75%,30% 75%,30% 55%,20% 55%,20% 70%,15% 70%,15% 60%,0 60%);
+animation:floatMosque 5s ease-in-out infinite alternate;
+}
+
+@keyframes floatMosque{
+from{transform:translateY(0);}
+to{transform:translateY(-10px);}
+}
+
+/* Glow */
+#glow{
+position:absolute;
+width:300px;
+height:300px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(255,255,255,0.3),transparent);
+pointer-events:none;
+transform:translate(-50%,-50%);
+}
+
+/* Shooting Stars */
+.star{
+position:absolute;
+width:120px;
+height:2px;
+background:linear-gradient(to right,white,transparent);
+animation:shoot 5s linear infinite;
+opacity:0.6;
+}
+
+@keyframes shoot{
+from{transform:translate(-200px,-200px) rotate(45deg);}
+to{transform:translate(120vw,120vh) rotate(45deg);}
+}
+</style>
+</head>
+<body>
+
+<div id="intro">
+<button id="startBtn">Enter Chand Raat 🌙</button>
+</div>
+
+<div id="message">Chand Raat Mubarak ✨</div>
+<div id="countdown"></div>
+<div class="mosque"></div>
+<div id="glow"></div>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9bce7e.mp3">
+</audio>
+
+<script>
+document.getElementById("startBtn").addEventListener("click",start,{once:true});
+
+function start(){
+document.getElementById("intro").style.opacity="0";
+setTimeout(()=>{document.getElementById("intro").remove();},1000);
+
+document.getElementById("message").style.opacity="1";
+document.getElementById("countdown").style.opacity="1";
+document.getElementById("bgMusic").play();
+
+startCountdown();
+initMoon();
+createStars();
+startFireworks();
+}
+
+/* 🔥 FIXED COUNTDOWN — NOW 1 MONTH (30 DAYS) */
+function startCountdown(){
+let ramadan = new Date();
+ramadan.setDate(ramadan.getDate() + 30);
+
+setInterval(()=>{
+let now = new Date();
+let diff = ramadan - now;
+
+let d = Math.floor(diff/1000/60/60/24);
+let h = Math.floor(diff/1000/60/60)%24;
+let m = Math.floor(diff/1000/60)%60;
+let s = Math.floor(diff/1000)%60;
+
+document.getElementById("countdown").innerHTML =
+"Ramadan Countdown: "+d+"d "+h+"h "+m+"m "+s+"s";
+},1000);
+}
+
+/* 3D Crescent Moon */
+function initMoon(){
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+const renderer=new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const geo=new THREE.SphereGeometry(3,32,32);
+const mat=new THREE.MeshPhongMaterial({color:0xffd700});
+const moon=new THREE.Mesh(geo,mat);
+scene.add(moon);
+
+const light=new THREE.PointLight(0xffffff,1);
+light.position.set(5,5,5);
+scene.add(light);
+
+camera.position.z=8;
+
+function animate(){
+requestAnimationFrame(animate);
+moon.rotation.y+=0.01;
+renderer.render(scene,camera);
+}
+animate();
+}
+
+/* Fireworks */
+function startFireworks(){
+setInterval(()=>{
+for(let i=0;i<20;i++){
+let p=document.createElement("div");
+p.style.position="absolute";
+p.style.width="6px";
+p.style.height="6px";
+p.style.borderRadius="50%";
+p.style.background="gold";
+p.style.left=Math.random()*window.innerWidth+"px";
+p.style.top=Math.random()*window.innerHeight+"px";
+p.style.transition="1s";
+document.body.appendChild(p);
+setTimeout(()=>{p.style.transform="scale(0)";p.remove();},1000);
+}
+},1500);
+}
+
+/* Shooting Stars */
+function createStars(){
+for(let i=0;i<3;i++){
+let s=document.createElement("div");
+s.className="star";
+s.style.top=Math.random()*300+"px";
+s.style.left=Math.random()*300+"px";
+document.body.appendChild(s);
+}
+}
+
+/* Mouse + Touch Glow */
+document.addEventListener("mousemove",(e)=>{
+let g=document.getElementById("glow");
+g.style.left=e.clientX+"px";
+g.style.top=e.clientY+"px";
+});
+
+document.addEventListener("touchmove",(e)=>{
+let g=document.getElementById("glow");
+g.style.left=e.touches[0].clientX+"px";
+g.style.top=e.touches[0].clientY+"px";
+});
+</script>
+
+</body>
+</html>
